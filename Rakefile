@@ -30,7 +30,7 @@ begin
   desc 'Run the specs'
   task :spec do
     title 'Running the specs'
-    puts "bacon #{FileList['spec/**/*_spec.rb'].shuffle.join(' ')}"
+    sh "bacon #{FileList['spec/**/*_spec.rb'].shuffle.join(' ')}"
 
     # Sorry rubocop, orta doesn't care
     # title 'Checking code style'

@@ -24,10 +24,17 @@ class StatsApp < Sinatra::Base
   end
 
   post '/api/v1/install' do
-    json_message( 200,
-      :ok => "OK"
-    )
-    # json_error(404, 'No pod found with the specified name.')
+    install_data = JSON.parse(request.body.read)
+    
+    if install_data["targets"] == nil || install_data["cocoapods_version"] == nil
+      json_error(400, 'Did not get the correct JSON format.')
+    else
+      targets, version = install_data.values_at('targets', 'name')
+      
+      json_message( 200,
+        :ok => "OK"
+      )
+    end
   end
 
 end
