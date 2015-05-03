@@ -8,6 +8,7 @@ gem 'nap'
 gem 'pg'
 gem 'sequel'
 gem 'sinatra'
+gem 'analytics-ruby', '~> 2.0.0', :require => 'segment/analytics'
 
 group :rake do
   gem 'rake'

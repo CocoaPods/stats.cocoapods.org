@@ -8,6 +8,7 @@ GEM
       thread_safe (~> 0.1)
       tzinfo (~> 1.1)
     addressable (2.3.7)
+    analytics-ruby (2.0.12)
     ast (2.0.0)
     bacon (1.2.0)
     crack (0.4.2)
@@ -91,6 +92,7 @@ PLATFORMS
 
 DEPENDENCIES
   activesupport
+  analytics-ruby (~> 2.0.0)
   bacon
   foreman
   i18n

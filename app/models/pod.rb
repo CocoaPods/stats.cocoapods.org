@@ -1,6 +1,4 @@
 module Pod
-  module StatsApp
-
     class Pod
       attr_accessor :name, :version
       
@@ -12,5 +10,4 @@ module Pod
       end
     end
     
-  end
 end
