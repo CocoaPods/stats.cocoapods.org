@@ -32,7 +32,7 @@ module Pod
 
     it 'gives an ok to posting correct data' do
       Analytics.stubs(:identify)
-      Analytics.stubs(:identify)
+      Analytics.stubs(:track)
       
       post "/api/v1/install", @data.to_json,  'HTTPS' => 'on'
     
