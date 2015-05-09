@@ -31,10 +31,8 @@ module Pod
     end
 
     it 'gives an ok to posting correct data' do
-      Analytics.expects(:identify)
-      Analytics.expects(:identify)
-      Analytics.expects(:track)
-      Analytics.expects(:track)
+      Analytics.stubs(:identify)
+      Analytics.stubs(:identify)
       
       post "/api/v1/install", @data.to_json,  'HTTPS' => 'on'
     
