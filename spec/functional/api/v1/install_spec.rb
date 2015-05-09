@@ -2,7 +2,6 @@ require File.expand_path('../../../../spec_helper', __FILE__)
 require File.expand_path('../../../../../app/controller', __FILE__)
 
 module Pod
-
   describe StatsApp, '/api/v1/install/' do
 
     it 'gives an ok to posting correct data' do

@@ -1,7 +1,7 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require File.expand_path('../../../spec_helper', __FILE__)
 require 'app/models/pod'
 
-module Pod::StatsApp
+module Pod
   describe Pod do
     describe 'data mapping' do
 

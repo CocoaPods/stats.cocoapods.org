@@ -1,4 +1,7 @@
 require 'sinatra/base'
+require 'app/models/pod'
+require 'app/models/target'
+require 'app/analytics'
 require 'segment/analytics'
 
 module Pod
@@ -25,10 +28,11 @@ module Pod
       { :ok => "yep" }.to_json
     end
     
-    Analytics = Segment::Analytics.new({
-        write_key: ENV["SEGMENT_WRITE_KEY"],
+    key = ENV["SEGMENT_WRITE_KEY"] || ""
+    Segment::Analytics.new(
+        write_key: key,
         on_error: Proc.new { |status, msg| print msg }
-    })
+    )
 
     post '/api/v1/install' do
       install_data = JSON.parse(request.body.read)
@@ -45,20 +49,24 @@ module Pod
           Analytics.identify(
             :user_id => target.uuid,
             :traits => {
-              :product_type => type,
+              :product_type => target.type,
             })
           
           pod_versions = target.pods.map do |pod|
             { pod.name => pod.version }
           end
           
+          # reduce all {pod: versions} into a single hash
+          pod_versions = pod_versions.map(&:to_a).flatten(1).reduce({}) {|h,(k,v)| (h[k] ||= []) << v; h}
+          puts pod_versions
+          
           # The pod names + versions are key values 
           # in the install event
           
           Analytics.track(
-            user_id: target.uuid,
-            event: "install",
-            properties: pod_versions )
+            :user_id => target.uuid,
+            :event => "install",
+            :properties => pod_versions )
         end
       
         json_message( 200,

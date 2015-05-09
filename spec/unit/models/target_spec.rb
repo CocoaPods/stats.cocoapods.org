@@ -1,7 +1,7 @@
-require 'spec/spec_helper'
+require File.expand_path('../../../spec_helper', __FILE__)
 require 'app/models/target'
 
-module Pod::StatsApp
+module Pod
   describe Target do
     describe 'data mapping' do
 
@@ -12,7 +12,7 @@ module Pod::StatsApp
         }
         target = Target.from_dict dict
         target.uuid.should == "342F9334FD3CCD087D0AB434"
-        target.pods.length.should == 2
+        target.pods.length.should == 0
       end
 
       it 'correctly makes pods' do
