@@ -58,15 +58,14 @@ module Pod
           
           # reduce all {pod: versions} into a single hash
           pod_versions = pod_versions.map(&:to_a).flatten(1).reduce({}) {|h,(k,v)| (h[k] ||= []) << v; h}
-          puts pod_versions
           
           # The pod names + versions are key values 
           # in the install event
-          
           Analytics.track(
             :user_id => target.uuid,
             :event => "install",
-            :properties => pod_versions )
+            :properties => pod_versions
+          )
         end
       
         json_message( 200,

@@ -4,12 +4,13 @@ require File.expand_path('../../../../../app/controller', __FILE__)
 module Pod
   describe StatsApp, '/api/v1/install/' do
 
-    it 'gives an ok to posting correct data' do
-      data = 
+    before do
+      @data = 
       { 
         "targets" => [
           {
             "uuid" => "342F9334FD3CCD087D0AB434",
+            "product_type" => "com.apple.product-type.application",
             "pods" => [
               { "name" => "ORStackView", "version" => "2.0.1" },
               { "name" => "ARAnalytics", "version" => "2.2.1" }
@@ -17,6 +18,7 @@ module Pod
           },
           {
             'uuid' => "342F9064DCA552635C1452CD",
+            "product_type" => "com.apple.product-type.bundle.unit-test",
             "pods" => [
               { "name" => "Specta", 'version' => "1.0.1" },
               { "name" => "Expecta", "version" => "0.8.9a" }
@@ -25,13 +27,48 @@ module Pod
         ],
         'cocoapods_version' => "0.37.0"
       }
-    
-      post "/api/v1/install", data.to_json,  'HTTPS' => 'on'
+      
+    end
+
+    it 'gives an ok to posting correct data' do
+      Analytics.expects(:identify)
+      Analytics.expects(:identify)
+      Analytics.expects(:track)
+      Analytics.expects(:track)
+      
+      post "/api/v1/install", @data.to_json,  'HTTPS' => 'on'
     
       last_response.status.should == 200
       last_response.content_type.should == 'application/json'
     
       JSON.parse(last_response.body).should == { 'ok' => "OK" }
+    end
+  
+    it 'creates the right analytics events' do
+      # We make two analytics calls per 
+      Analytics.expects(:identify).with( 
+        :user_id => '342F9334FD3CCD087D0AB434', 
+        :traits => {:product_type => "com.apple.product-type.application"}\
+      )
+    
+      Analytics.expects(:track).with( 
+        :user_id => '342F9334FD3CCD087D0AB434', 
+        :event => 'install', 
+        :properties => {'ORStackView' => ['2.0.1'], 'ARAnalytics' => ['2.2.1']}
+      )
+    
+      Analytics.expects(:identify).with(
+        :user_id => '342F9064DCA552635C1452CD', 
+        :traits => {:product_type => 'com.apple.product-type.bundle.unit-test'}
+      )
+    
+      Analytics.expects(:track).with( 
+        :user_id => '342F9064DCA552635C1452CD', 
+        :event => 'install', 
+        :properties => {'Specta' => ['1.0.1'], 'Expecta' => ['0.8.9a']} 
+      )
+      
+      post "/api/v1/install", @data.to_json,  'HTTPS' => 'on'
     end
   
     it 'gives an error when posting incorrect data' do
