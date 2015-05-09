@@ -43,10 +43,11 @@ module Pod
     end
   
     it 'creates the right analytics events' do
-      # We make two analytics calls per 
+      # We make two analytics calls per target
+      # For the App:
       Analytics.expects(:identify).with( 
         :user_id => '342F9334FD3CCD087D0AB434', 
-        :traits => {:product_type => "com.apple.product-type.application"}\
+        :traits => {:product_type => "com.apple.product-type.application"}
       )
     
       Analytics.expects(:track).with( 
@@ -54,7 +55,7 @@ module Pod
         :event => 'install', 
         :properties => {'ORStackView' => ['2.0.1'], 'ARAnalytics' => ['2.2.1']}
       )
-    
+      # For the Unit Tests Target    
       Analytics.expects(:identify).with(
         :user_id => '342F9064DCA552635C1452CD', 
         :traits => {:product_type => 'com.apple.product-type.bundle.unit-test'}
