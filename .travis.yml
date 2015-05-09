@@ -1,0 +1,2 @@
+language: ruby
+install: bundle install --deployment --without development production
