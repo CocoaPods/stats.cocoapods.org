@@ -31,8 +31,8 @@ module Pod
     end
 
     it 'gives an ok to posting correct data' do
-      Analytics.stubs(:identify)
-      Analytics.stubs(:track)
+      PodAnalytics.stubs(:identify)
+      PodAnalytics.stubs(:track)
       
       post "/api/v1/install", @data.to_json,  'HTTPS' => 'on'
     
@@ -45,23 +45,23 @@ module Pod
     it 'creates the right analytics events' do
       # We make two analytics calls per target
       # For the App:
-      Analytics.expects(:identify).with( 
+      PodAnalytics.expects(:identify).with( 
         :user_id => '342F9334FD3CCD087D0AB434', 
         :traits => {:product_type => "com.apple.product-type.application"}
       )
     
-      Analytics.expects(:track).with( 
+      PodAnalytics.expects(:track).with( 
         :user_id => '342F9334FD3CCD087D0AB434', 
         :event => 'install', 
         :properties => {'ORStackView' => ['2.0.1'], 'ARAnalytics' => ['2.2.1']}
       )
       # For the Unit Tests Target    
-      Analytics.expects(:identify).with(
+      PodAnalytics.expects(:identify).with(
         :user_id => '342F9064DCA552635C1452CD', 
         :traits => {:product_type => 'com.apple.product-type.bundle.unit-test'}
       )
     
-      Analytics.expects(:track).with( 
+      PodAnalytics.expects(:track).with( 
         :user_id => '342F9064DCA552635C1452CD', 
         :event => 'install', 
         :properties => {'Specta' => ['1.0.1'], 'Expecta' => ['0.8.9a']} 
