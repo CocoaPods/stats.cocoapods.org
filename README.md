@@ -1,19 +1,12 @@
-metrics.cocoapods.org
+stats.cocoapods.org
 =====================
 
-Metrics calculations & Metrics API for CocoaPods.
+Stats generation for CocoaPods, it recieves a call from the [cocoapods-stats](https://github.com/cocoapods/cocoapods-stats) plugin which are forwarded into events in Segment.
 
 ## Installation
 
-1. Migrate the databases for the various environments via Humus.
+1. Clone & `bundle install`
 
 ### Run tests
 
-1. Seed the test DB in trunk (while Humus does not yet seed): `RACK_ENV=test bundle exec rake db:seed`
-
-2. You can now run the tests using:
-
 		$ bundle exec rake spec
-
-
-[1]: https://github.com/CocoaPods/trunk.cocoapods.org

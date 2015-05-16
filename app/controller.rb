@@ -43,6 +43,7 @@ module Pod
             :user_id => target.uuid,
             :traits => {
               :product_type => target.type,
+              :cocoapods_version => install_data["cocoapods_version"]
             })
           
           pod_versions = target.pods.map do |pod|
