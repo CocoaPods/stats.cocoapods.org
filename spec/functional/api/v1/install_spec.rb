@@ -10,7 +10,7 @@ module Pod
         "targets" => [
           {
             "uuid" => "342F9334FD3CCD087D0AB434",
-            "product_type" => "com.apple.product-type.application",
+            "type" => "com.apple.product-type.application",
             "pods" => [
               { "name" => "ORStackView", "version" => "2.0.1" },
               { "name" => "ARAnalytics", "version" => "2.2.1" }
@@ -18,7 +18,7 @@ module Pod
           },
           {
             'uuid' => "342F9064DCA552635C1452CD",
-            "product_type" => "com.apple.product-type.bundle.unit-test",
+            "type" => "com.apple.product-type.bundle.unit-test",
             "pods" => [
               { "name" => "Specta", 'version' => "1.0.1" },
               { "name" => "Expecta", "version" => "0.8.9a" }

@@ -7,7 +7,7 @@ module Pod
     def self.from_dict(dict)
       t = Target.new
       t.uuid = dict["uuid"]
-      t.type = dict["product_type"]
+      t.type = dict["type"]
       t.pods = dict["pods"].map { |p| Pod.from_dict(p) }
       t
     end

@@ -8,11 +8,13 @@ module Pod
       it 'makes an object from json' do
         dict = {
           "uuid" => "342F9334FD3CCD087D0AB434",
-          "pods" => []
+          "pods" => [],
+          "type" => "Hello"
         }
         target = Target.from_dict dict
         target.uuid.should == "342F9334FD3CCD087D0AB434"
         target.pods.length.should == 0
+        target.type.should == "Hello"
       end
 
       it 'correctly makes pods' do
