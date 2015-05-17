@@ -51,15 +51,17 @@ module Pod
           end
           
           # reduce all {pod: versions} into a single hash
-          pod_versions = pod_versions.map(&:to_a).flatten(1).reduce({}) {|h,(k,v)| (h[k] ||= []) << v; h}
+          event = pod_versions.map(&:to_a).flatten(1).reduce({}) {|h,(k,v)| (h[k] ||= []) << v; h}
+          # The above mapping returns an array of versions, we dont need this, its 
+          # always the first 
+          event = event.inject({}){ |hash, (k, v)| hash.merge( k => v.first )  }
+          
+          # Merge in the actual details at the end
+          event.merge!({:user_id => target.uuid, :event => "install" })
           
           # The pod names + versions are key values 
           # in the install event
-          PodAnalytics.track(
-            :user_id => target.uuid,
-            :event => "install",
-            :properties => pod_versions
-          )
+          PodAnalytics.track event
         end
       
         json_message( 200,

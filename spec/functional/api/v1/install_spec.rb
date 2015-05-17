@@ -47,24 +47,33 @@ module Pod
       # For the App:
       PodAnalytics.expects(:identify).with( 
         :user_id => '342F9334FD3CCD087D0AB434', 
-        :traits => {:product_type => "com.apple.product-type.application"}
+        :traits => {
+          :product_type => "com.apple.product-type.application",
+          :cocoapods_version => '0.37.0'
+        }
       )
-    
+      
       PodAnalytics.expects(:track).with( 
+        "ORStackView" => '2.0.1',
+        "ARAnalytics" => '2.2.1',
         :user_id => '342F9334FD3CCD087D0AB434', 
-        :event => 'install', 
-        :properties => {'ORStackView' => ['2.0.1'], 'ARAnalytics' => ['2.2.1']}
+        :event => 'install' 
       )
+      
       # For the Unit Tests Target    
       PodAnalytics.expects(:identify).with(
         :user_id => '342F9064DCA552635C1452CD', 
-        :traits => {:product_type => 'com.apple.product-type.bundle.unit-test'}
+        :traits => {
+          :product_type => 'com.apple.product-type.bundle.unit-test',
+          :cocoapods_version => '0.37.0'
+        }
       )
     
       PodAnalytics.expects(:track).with( 
+        "Specta" => '1.0.1', 
+        "Expecta" => '0.8.9a',
         :user_id => '342F9064DCA552635C1452CD', 
-        :event => 'install', 
-        :properties => {'Specta' => ['1.0.1'], 'Expecta' => ['0.8.9a']} 
+        :event => 'install'
       )
       
       post "/api/v1/install", @data.to_json,  'HTTPS' => 'on'
