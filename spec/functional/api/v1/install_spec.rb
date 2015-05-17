@@ -54,10 +54,12 @@ module Pod
       )
       
       PodAnalytics.expects(:track).with( 
-        "ORStackView" => '2.0.1',
-        "ARAnalytics" => '2.2.1',
         :user_id => '342F9334FD3CCD087D0AB434', 
-        :event => 'install' 
+        :event => 'install',
+        :properties => {
+          "ORStackView" => '2.0.1',
+          "ARAnalytics" => '2.2.1'
+        }
       )
       
       # For the Unit Tests Target    
@@ -70,10 +72,12 @@ module Pod
       )
     
       PodAnalytics.expects(:track).with( 
-        "Specta" => '1.0.1', 
-        "Expecta" => '0.8.9a',
         :user_id => '342F9064DCA552635C1452CD', 
-        :event => 'install'
+        :event => 'install',
+        :properties => {
+          "Specta" => '1.0.1', 
+          "Expecta" => '0.8.9a',
+        }
       )
       
       post "/api/v1/install", @data.to_json,  'HTTPS' => 'on'
