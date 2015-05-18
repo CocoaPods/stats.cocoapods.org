@@ -1,7 +1,7 @@
 require File.expand_path('../../../../spec_helper', __FILE__)
-require File.expand_path('../../../../../app/controller', __FILE__)
+require File.expand_path('../../../../../app/api_controller', __FILE__)
 
-module Pod
+module PodStats
   describe StatsApp, '/api/v1/install/' do
 
     before do
@@ -57,9 +57,9 @@ module Pod
         :user_id => '342F9334FD3CCD087D0AB434', 
         :event => 'install',
         :properties => {
+          :product_type => "com.apple.product-type.application",
           "ORStackView" => '2.0.1',
           "ARAnalytics" => '2.2.1',
-          :product_type => "com.apple.product-type.application",
         }
       )
       
@@ -76,9 +76,9 @@ module Pod
         :user_id => '342F9064DCA552635C1452CD', 
         :event => 'install',
         :properties => {
+          :product_type => 'com.apple.product-type.bundle.unit-test',
           "Specta" => '1.0.1', 
           "Expecta" => '0.8.9a',
-          :product_type => 'com.apple.product-type.bundle.unit-test',
         }
       )
       

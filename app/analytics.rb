@@ -1,7 +1,7 @@
 require 'app/models/pod'
 require 'segment/analytics'
 
-module Pod
+module PodStats
   class PodAnalytics
 
     key = ENV["SEGMENT_WRITE_KEY"] || ""

@@ -1,6 +1,6 @@
-require 'app/models/pod'
+require 'app/models/pod_version'
 
-module Pod
+module PodStats
   class Target
     attr_accessor :uuid, :pods, :type
     
@@ -8,7 +8,7 @@ module Pod
       t = Target.new
       t.uuid = dict["uuid"]
       t.type = dict["type"]
-      t.pods = dict["pods"].map { |p| Pod.from_dict(p) }
+      t.pods = dict["pods"].map { |p| PodVersion.from_dict(p) }
       t
     end
   end    

@@ -1,7 +1,7 @@
 require File.expand_path('../../../../spec_helper', __FILE__)
-require File.expand_path('../../../../../app/controller', __FILE__)
+require File.expand_path('../../../../../app/api_controller', __FILE__)
 
-module Pod
+module PodStats
 
   describe StatsApp, '/api/v1/status' do
 

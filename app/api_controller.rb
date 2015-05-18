@@ -3,7 +3,7 @@ require 'app/models/pod'
 require 'app/models/target'
 require 'app/analytics'
 
-module Pod
+module PodStats
   class StatsApp < Sinatra::Base
     set :protection, :except => :json_csrf
   
@@ -62,9 +62,10 @@ module Pod
           PodAnalytics.track(
             :user_id => target.uuid,
             :event => "install",
-            :properties => pod_versions.merge({
+            :properties => {
               :product_type => target.type,
-              })
+
+            }.merge(pod_versions)
           )
         end
       

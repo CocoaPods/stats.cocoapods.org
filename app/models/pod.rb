@@ -1,13 +1,17 @@
-module Pod
-  class Pod
-    attr_accessor :name, :version
-    
-    def self.from_dict(dict)
-      t = Pod.new
-      t.name = dict["name"]
-      t.version = dict["version"]
-      t
-    end
+require 'lib/pod_metrics'
+
+# Only for reading purposes.
+#
+class Pod < Sequel::Model(:pods)
+  include PodMetrics
+
+  plugin :timestamps
+
+  # E.g. Pod.oldest(2)
+  #
+  def self.oldest(amount = 100)
+    order(:updated_at).limit(amount)
   end
 
 end
+
