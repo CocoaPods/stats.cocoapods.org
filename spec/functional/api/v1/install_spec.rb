@@ -58,7 +58,8 @@ module Pod
         :event => 'install',
         :properties => {
           "ORStackView" => '2.0.1',
-          "ARAnalytics" => '2.2.1'
+          "ARAnalytics" => '2.2.1',
+          :product_type => "com.apple.product-type.application",
         }
       )
       
@@ -77,6 +78,7 @@ module Pod
         :properties => {
           "Specta" => '1.0.1', 
           "Expecta" => '0.8.9a',
+          :product_type => 'com.apple.product-type.bundle.unit-test',
         }
       )
       

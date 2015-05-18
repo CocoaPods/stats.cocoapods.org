@@ -62,7 +62,9 @@ module Pod
           PodAnalytics.track(
             :user_id => target.uuid,
             :event => "install",
-            :properties => pod_versions
+            :properties => pod_versions.merge({
+              :product_type => target.type,
+              })
           )
         end
       
