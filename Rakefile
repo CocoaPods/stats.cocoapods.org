@@ -17,6 +17,10 @@ begin
     ENV['RACK_ENV'] ||= 'development'
   end
 
+  task :update_stats do 
+    exec 'ruby app/stats_coordinator.rb'    
+  end
+
   desc 'Starts a interactive console with the model env loaded'
   task :console do
     exec 'irb', '-I', File.expand_path('../', __FILE__), '-r', 'config/init'

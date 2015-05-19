@@ -43,8 +43,8 @@ module PodStats
     end
   
     it 'creates the right analytics events' do
-      # We make two analytics calls per target
-      # For the App:
+
+      # We make an identify per target
       PodAnalytics.expects(:identify).with( 
         :user_id => '342F9334FD3CCD087D0AB434', 
         :traits => {
@@ -53,13 +53,29 @@ module PodStats
         }
       )
       
+      # Then each dependency gets its own track
+      
       PodAnalytics.expects(:track).with( 
         :user_id => '342F9334FD3CCD087D0AB434', 
         :event => 'install',
         :properties => {
           :product_type => "com.apple.product-type.application",
-          "ORStackView" => '2.0.1',
-          "ARAnalytics" => '2.2.1',
+          :dependency => {
+            :name => "ORStackView",
+            :version => "2.0.1"
+          }
+        }
+      )
+      
+      PodAnalytics.expects(:track).with( 
+        :user_id => '342F9334FD3CCD087D0AB434', 
+        :event => 'install',
+        :properties => {
+          :product_type => "com.apple.product-type.application",
+          :dependency => {
+            :name => "ARAnalytics",
+            :version => "2.2.1"
+          }
         }
       )
       
@@ -77,8 +93,22 @@ module PodStats
         :event => 'install',
         :properties => {
           :product_type => 'com.apple.product-type.bundle.unit-test',
-          "Specta" => '1.0.1', 
-          "Expecta" => '0.8.9a',
+          :dependency => {
+            :name => "Specta",
+            :version => "1.0.1"
+          }
+        }
+      )
+      
+      PodAnalytics.expects(:track).with( 
+        :user_id => '342F9064DCA552635C1452CD', 
+        :event => 'install',
+        :properties => {
+          :product_type => 'com.apple.product-type.bundle.unit-test',
+          :dependency => {
+            :name => "Expecta",
+            :version => "0.8.9a"
+          }
         }
       )
       

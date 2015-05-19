@@ -1,16 +1,8 @@
-module PodStats
-  class Stat
-      attr_accessor :pod_name, :download_total, :download_week, :download_month, :app_total, 
-:app_week, :tests_total, :tests_week, :extension_keyboard_total, :extension_keyboard_week, :extension_action_total, :extension_action_week, :extension_share_total, :extension_share_week, :extension_watch_total, :extension_watch_week, :extension_today_total, :extension_today_week
+require_relative '../config/init'
+require_relative 'models/stats_metrics'
 
-    # Creates an object with corrosponing hash keys to properties
-    def initialize(*h)
-      if h.length == 1 && h.first.is_a?(Hash)
-        h.first.each { |k, v| send("#{k}=", v) }
-      end
-    end
-  end
-  
+module PodStats
+
   class StatsCoordinator
 
     def loop_pods
@@ -20,8 +12,8 @@ module PodStats
     end
     
     def stat_for_pod pod
-      # create or find?
-      Stat.new { :pod_name => pod }
+      result = StatsMetrics.find(:pod_id => @pod.id)
+      
     end
     
     def get_download_data pod
@@ -29,4 +21,8 @@ module PodStats
     end
 
   end
+  
+  stats = StatsCoordinator.new
+  stats.loop_pods
+  
 end
