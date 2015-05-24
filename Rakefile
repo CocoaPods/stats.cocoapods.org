@@ -17,8 +17,8 @@ begin
     ENV['RACK_ENV'] ||= 'development'
   end
 
-  task :update_stats do 
-    exec 'ruby app/stats_coordinator.rb'    
+  task :update_stats do
+    exec 'ruby app/stats_coordinator.rb'
   end
 
   desc 'Starts a interactive console with the model env loaded'
@@ -44,6 +44,11 @@ begin
   desc 'Use Kicker to automatically run specs'
   task :kick do
     exec 'bundle exec kicker -c'
+  end
+
+  task 'Get stats for all pods'
+  task :daily do
+    exec 'bundle', 'exec', 'ruby', 'runner/stats_coordinator.rb', '-r', 'config/init'
   end
 
   task :default => :spec
