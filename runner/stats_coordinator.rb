@@ -22,6 +22,7 @@ module PodStats
     def connect
       db = URI(ENV["ANALYTICS_SQL_URL"])
       @conn ||= PGconn.new(db.host, db.port, '', '', db.path[1..-1], db.user, db.password)
+      @conn.exec "set search_path to '#{ENV["ANALYTICS_DB_SCHEMA"]}';"
     end
 
     def loop_pods
@@ -60,7 +61,7 @@ module PodStats
     def download pod_name, time=nil
       query = <<-eos
         SELECT COUNT(dependency_name)
-        FROM #{ENV["ANALYTICS_DB_SCHEMA"]}.install
+        FROM install
         WHERE dependency_name = '#{pod_name}'
       eos
       query += "AND sent_at >= current_date - interval '#{time}'" if time
@@ -73,7 +74,7 @@ module PodStats
 
       query = <<-eos
         SELECT COUNT(DISTINCT(user_id))
-        FROM #{ENV["ANALYTICS_DB_SCHEMA"]}.install
+        FROM install
         WHERE dependency_name = '#{pod_name}'
         AND product_type = '#{type_id}'
       eos
