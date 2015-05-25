@@ -5,6 +5,7 @@ require 'pg'
 module PodStats
 
   class StatsCoordinator
+    attr_accessor :connection
 
     PRODUCT_TYPE_UTI = {
       :application       => 'com.apple.product-type.application',
@@ -20,16 +21,12 @@ module PodStats
     }.freeze
 
     def connect
-      db = URI(ENV["ANALYTICS_SQL_URL"])
-      @conn ||= PGconn.new(db.host, db.port, '', '', db.path[1..-1], db.user, db.password)
-      @conn.exec "set search_path to '#{ENV["ANALYTICS_DB_SCHEMA"]}';"
-    end
-
-    def loop_pods
-      [["72", "Expecta"], ["2728", "ORStackView"]].each do |pod|
-        data = stat_for_pod pod[0], pod[1]
-        update_pod pod[0], data
+      unless @connection
+        db = URI(ENV["ANALYTICS_SQL_URL"])
+        @connection = PGconn.new(db.host, db.port, '', '', db.path[1..-1], db.user, db.password)
       end
+
+      @connection.exec "set search_path to '#{ENV["ANALYTICS_DB_SCHEMA"]}';"
     end
 
     def stat_for_pod pod_id, name
@@ -66,7 +63,7 @@ module PodStats
       eos
       query += "AND sent_at >= current_date - interval '#{time}'" if time
 
-      @conn.exec(query)[0]["count"].to_i || 0
+      @connection.exec(query)[0]["count"].to_i || 0
     end
 
     def target pod_name, type, time=nil
@@ -80,7 +77,7 @@ module PodStats
       eos
       query += "AND sent_at >= current_date - interval '#{time}'" if time
 
-      @conn.exec(query)[0]["count"].to_i || 0
+      @connection.exec(query)[0]["count"].to_i || 0
     end
 
   end
