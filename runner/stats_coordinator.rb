@@ -42,7 +42,8 @@ module PodStats
         :tests_total => target(name, :unit_test_bundle),
         :tests_week => target(name, :unit_test_bundle, "7 days"),
         :extension_total => target(name, :app_extension),
-        :extension_week => target(name, :app_extension, "7 days")
+        :extension_week => target(name, :app_extension, "7 days"),
+        :updated_at => Time.new
       }
     end
 
