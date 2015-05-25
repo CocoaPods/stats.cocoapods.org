@@ -45,7 +45,7 @@ db_loggers = []
 db_loggers << METRICS_APP_LOGGER # TODO: For now also enable DB logger in production. unless ENV['RACK_ENV'] == 'production'
 DB = Sequel.connect(ENV['DATABASE_URL'], :loggers => db_loggers)
 DB.timezone = :utc
-Sequel.extension :core_extensions, :migration
+Sequel.extension :core_extensions, :migration, :pagination
 
 class << DB
   # Save point is needed in testing, because tests already run in a

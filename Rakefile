@@ -48,7 +48,7 @@ begin
 
   task 'Get stats for all pods'
   task :daily do
-    exec 'bundle', 'exec', 'ruby', 'runner/stats_coordinator.rb', '-r', 'config/init'
+    exec 'bundle', 'exec', 'foreman', 'run', 'ruby', 'runner/daily_runner.rb', '-r', 'config/init'
   end
 
   task :default => :spec

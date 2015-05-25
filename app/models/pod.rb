@@ -1,4 +1,4 @@
-require 'lib/pod_metrics'
+require_relative '../../lib/pod_metrics'
 
 # Only for reading purposes.
 #
@@ -14,4 +14,3 @@ class Pod < Sequel::Model(:pods)
   end
 
 end
-

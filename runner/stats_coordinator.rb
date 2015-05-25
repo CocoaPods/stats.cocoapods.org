@@ -19,18 +19,20 @@ module PodStats
       :watch_extension   => 'com.apple.product-type.watchkit-extension',
     }.freeze
 
-    def loop_pods
+    def connect
       db = URI(ENV["ANALYTICS_SQL_URL"])
-      @conn = PGconn.new(db.host, db.port, '', '', db.path[1..-1], db.user, db.password)
+      @conn ||= PGconn.new(db.host, db.port, '', '', db.path[1..-1], db.user, db.password)
+    end
 
+    def loop_pods
       [["72", "Expecta"], ["2728", "ORStackView"]].each do |pod|
-        stat_for_pod pod[0], pod[1]
+        data = stat_for_pod pod[0], pod[1]
+        update_pod pod[0], data
       end
     end
 
     def stat_for_pod pod_id, name
-
-      data = {
+      {
         :pod_id => pod_id,
         :download_total => download(name),
         :download_week => download(name, "7 days"),
@@ -42,22 +44,22 @@ module PodStats
         :extension_total => target(name, :app_extension),
         :extension_week => target(name, :app_extension, "7 days")
       }
+    end
 
-      puts data
-
+    def update_pod pod_id, data
       result = StatsMetrics.find(:pod_id => pod_id)
       if result
-        StatsMetrics.where(id: result.id).update(data).to_json
+        StatsMetrics.where(id: result.id).update(data)
       else
         data[:created_at] = Time.new
-        StatsMetrics.insert(data).kick.to_json
+        StatsMetrics.insert(data)
       end
     end
 
     def download pod_name, time=nil
       query = <<-eos
         SELECT COUNT(dependency_name)
-        FROM cocoapods_stats_staging.install
+        FROM #{ENV["ANALYTICS_DB_SCHEMA"]}.install
         WHERE dependency_name = '#{pod_name}'
       eos
       query += "AND sent_at >= current_date - interval '#{time}'" if time
@@ -66,25 +68,18 @@ module PodStats
     end
 
     def target pod_name, type, time=nil
-        type_id = PRODUCT_TYPE_UTI[:type]
+      type_id = PRODUCT_TYPE_UTI[type]
 
-        query = <<-eos
-          SELECT COUNT(DISTINCT(user_id))
-          FROM cocoapods_stats_staging.install
-          WHERE dependency_name = '#{pod_name}'
-          AND product_type = '#{type_id}'
-        eos
-        query += "AND sent_at >= current_date - interval '#{time}'" if time
+      query = <<-eos
+        SELECT COUNT(DISTINCT(user_id))
+        FROM #{ENV["ANALYTICS_DB_SCHEMA"]}.install
+        WHERE dependency_name = '#{pod_name}'
+        AND product_type = '#{type_id}'
+      eos
+      query += "AND sent_at >= current_date - interval '#{time}'" if time
 
-        @conn.exec(query)[0]["count"].to_i || 0
+      @conn.exec(query)[0]["count"].to_i || 0
     end
 
   end
-
-  puts "Start >--------- #{Time.now}"
-
-  stats = StatsCoordinator.new
-  stats.loop_pods
-
-  puts "End >----------- #{Time.now} "
 end
