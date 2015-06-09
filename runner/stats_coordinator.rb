@@ -42,7 +42,7 @@ module PodStats
         :extension_total => target(name, :app_extension),
         :extension_week => target(name, :app_extension, "7 days"),
         :watch_total => target(name, :watch_extension),
-        :watch_week => target(name, :watch_extension, , "7 days"),
+        :watch_week => target(name, :watch_extension, "7 days"),
         :updated_at => Time.new
       }
     end
