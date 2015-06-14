@@ -71,6 +71,7 @@ module PodStats
         SELECT COUNT(dependency_name)
         FROM install
         WHERE dependency_name = '#{pod_name}'
+        AND pod_try = true
       eos
       query += "AND sent_at >= current_date - interval '#{time}'" if time
 
@@ -82,6 +83,7 @@ module PodStats
         SELECT COUNT(dependency_name)
         FROM install
         WHERE dependency_name = '#{pod_name}'
+        AND pod_try = false
       eos
       query += "AND sent_at >= current_date - interval '#{time}'" if time
 
@@ -96,6 +98,7 @@ module PodStats
         FROM install
         WHERE dependency_name = '#{pod_name}'
         AND product_type = '#{type_id}'
+        AND pod_try = false
       eos
       query += "AND sent_at >= current_date - interval '#{time}'" if time
 
