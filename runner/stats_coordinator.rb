@@ -28,10 +28,9 @@ module PodStats
 
       @connection.exec "set search_path to '#{ENV["ANALYTICS_DB_SCHEMA"]}';"
     end
-
-    def stat_for_pod pod_id, name
+    
+    def metrics_for_pod name
       {
-        :pod_id => pod_id,
         :download_total => download(name),
         :download_week => download(name, "7 days"),
         :download_month => download(name, "30 days"),
@@ -43,8 +42,18 @@ module PodStats
         :extension_week => target(name, :app_extension, "7 days"),
         :watch_total => target(name, :watch_extension),
         :watch_week => target(name, :watch_extension, "7 days"),
-        :updated_at => Time.new
+        :pod_try_total => pod_try(name),
+        :pod_try_week => pod_try(name, "7 days"),
       }
+    end
+
+    def stat_for_pod pod_id, name
+      metrics = metrics_for_pod name
+      metrics.merge({
+        :pod_id => pod_id,
+        :is_active => metrics.any?(&:nonzero?),
+        :updated_at => Time.new
+      })
     end
 
     def update_pod pod_id, data
@@ -55,6 +64,17 @@ module PodStats
         data[:created_at] = Time.new
         StatsMetrics.insert(data)
       end
+    end
+
+    def pod_try pod_name, time=nil
+      query = <<-eos
+        SELECT COUNT(dependency_name)
+        FROM install
+        WHERE dependency_name = '#{pod_name}'
+      eos
+      query += "AND sent_at >= current_date - interval '#{time}'" if time
+
+      @connection.exec(query)[0]["count"].to_i || 0      
     end
 
     def download pod_name, time=nil

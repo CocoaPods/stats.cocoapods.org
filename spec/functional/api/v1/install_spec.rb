@@ -11,6 +11,7 @@ module PodStats
           {
             "uuid" => "342F9334FD3CCD087D0AB434",
             "type" => "com.apple.product-type.application",
+            "platform" => "ios",
             "pods" => [
               { "name" => "ORStackView", "version" => "2.0.1" },
               { "name" => "ARAnalytics", "version" => "2.2.1" }
@@ -19,13 +20,16 @@ module PodStats
           {
             'uuid' => "342F9064DCA552635C1452CD",
             "type" => "com.apple.product-type.bundle.unit-test",
+            "platform" => "ios",
             "pods" => [
               { "name" => "Specta", 'version' => "1.0.1" },
               { "name" => "Expecta", "version" => "0.8.9a" }
             ]
           }
         ],
-        'cocoapods_version' => "0.37.0"
+        "cocoapods_version" => "0.37.0",
+        "pod_try" => false
+        
       }
       
     end
@@ -49,7 +53,8 @@ module PodStats
         :user_id => '342F9334FD3CCD087D0AB434', 
         :traits => {
           :product_type => "com.apple.product-type.application",
-          :cocoapods_version => '0.37.0'
+          :cocoapods_version => '0.37.0',
+          :platform => 'ios',
         }
       )
       
@@ -60,6 +65,8 @@ module PodStats
         :event => 'install',
         :properties => {
           :product_type => "com.apple.product-type.application",
+          :pod_try => false,
+          :platform => 'ios',
           :dependency => {
             :name => "ORStackView",
             :version => "2.0.1"
@@ -72,6 +79,8 @@ module PodStats
         :event => 'install',
         :properties => {
           :product_type => "com.apple.product-type.application",
+          :pod_try => false,
+          :platform => 'ios',
           :dependency => {
             :name => "ARAnalytics",
             :version => "2.2.1"
@@ -84,7 +93,8 @@ module PodStats
         :user_id => '342F9064DCA552635C1452CD', 
         :traits => {
           :product_type => 'com.apple.product-type.bundle.unit-test',
-          :cocoapods_version => '0.37.0'
+          :cocoapods_version => '0.37.0',
+          :platform => 'ios'
         }
       )
     
@@ -93,6 +103,8 @@ module PodStats
         :event => 'install',
         :properties => {
           :product_type => 'com.apple.product-type.bundle.unit-test',
+          :pod_try => false,
+          :platform => 'ios',
           :dependency => {
             :name => "Specta",
             :version => "1.0.1"
@@ -105,6 +117,8 @@ module PodStats
         :event => 'install',
         :properties => {
           :product_type => 'com.apple.product-type.bundle.unit-test',
+          :pod_try => false,
+          :platform => 'ios',
           :dependency => {
             :name => "Expecta",
             :version => "0.8.9a"

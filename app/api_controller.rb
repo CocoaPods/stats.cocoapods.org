@@ -43,7 +43,8 @@ module PodStats
             :user_id => target.uuid,
             :traits => {
               :product_type => target.type,
-              :cocoapods_version => install_data["cocoapods_version"]
+              :cocoapods_version => install_data["cocoapods_version"],
+              :platform => target.platform
             })
                     
           target.pods.each do |pod|
@@ -53,6 +54,8 @@ module PodStats
               :event => "install",
               :properties => {
                 :product_type => target.type,
+                :pod_try => install_data["pod_try"],
+                :platform => target.platform,
                 :dependency => {
                   :name => pod.name,
                   :version => pod.version
