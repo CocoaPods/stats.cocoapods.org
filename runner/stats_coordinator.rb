@@ -28,7 +28,7 @@ module PodStats
 
       @connection.exec "set search_path to '#{ENV["ANALYTICS_DB_SCHEMA"]}';"
     end
-    
+
     def metrics_for_pod name
       {
         :download_total => download(name),
@@ -51,7 +51,7 @@ module PodStats
       metrics = metrics_for_pod name
       metrics.merge({
         :pod_id => pod_id,
-        :is_active => metrics.any?(&:nonzero?),
+        :is_active => metrics.any? { |_, installs| installs.nonzero? },
         :updated_at => Time.new
       })
     end
@@ -75,7 +75,7 @@ module PodStats
       eos
       query += "AND sent_at >= current_date - interval '#{time}'" if time
 
-      @connection.exec(query)[0]["count"].to_i || 0      
+      @connection.exec(query)[0]["count"].to_i || 0
     end
 
     def download pod_name, time=nil
