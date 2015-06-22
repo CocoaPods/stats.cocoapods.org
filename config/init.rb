@@ -23,17 +23,17 @@ require 'json/ext'
 require 'logger'
 require 'fileutils'
 
-if ENV['METRICS_APP_LOG_TO_STDOUT']
+if ENV['STATS_APP_LOG_TO_STDOUT']
   STDOUT.sync = true
   STDERR.sync = true
-  METRICS_APP_LOGGER = Logger.new(STDOUT)
-  METRICS_APP_LOGGER.level = Logger::INFO
+  STATS_APP_LOGGER = Logger.new(STDOUT)
+  STATS_APP_LOGGER.level = Logger::INFO
 else
   FileUtils.mkdir_p(File.join(ROOT, 'log'))
-  METRICS_APP_LOG_FILE = File.new(File.join(ROOT, "log/#{ENV['RACK_ENV']}.log"), 'a+')
-  METRICS_APP_LOG_FILE.sync = true
-  METRICS_APP_LOGGER = Logger.new(METRICS_APP_LOG_FILE)
-  METRICS_APP_LOGGER.level = Logger::DEBUG
+  STATS_APP_LOG_FILE = File.new(File.join(ROOT, "log/#{ENV['RACK_ENV']}.log"), 'a+')
+  STATS_APP_LOG_FILE.sync = true
+  STATS_APP_LOGGER = Logger.new(STATS_APP_LOG_FILE)
+  STATS_APP_LOGGER.level = Logger::DEBUG
 end
 
 # -- Database -----------------------------------------------------------------
@@ -42,7 +42,7 @@ require 'sequel'
 require 'pg'
 
 db_loggers = []
-db_loggers << METRICS_APP_LOGGER # TODO: For now also enable DB logger in production. unless ENV['RACK_ENV'] == 'production'
+db_loggers << STATS_APP_LOGGER # TODO: For now also enable DB logger in production. unless ENV['RACK_ENV'] == 'production'
 DB = Sequel.connect(ENV['DATABASE_URL'], :loggers => db_loggers)
 DB.timezone = :utc
 Sequel.extension :core_extensions, :migration, :pagination
