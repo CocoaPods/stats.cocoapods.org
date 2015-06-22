@@ -26,7 +26,7 @@ module PodStats
         @connection = PGconn.new(db.host, db.port, '', '', db.path[1..-1], db.user, db.password)
       end
 
-      @connection.exec "set search_path to '#{ENV["ANALYTICS_DB_SCHEMA"]}';"
+      @connection.exec "set search_path to $1;", [ENV["ANALYTICS_DB_SCHEMA"]]
     end
 
     def metrics_for_pod name
