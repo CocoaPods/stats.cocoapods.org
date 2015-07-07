@@ -53,7 +53,7 @@ module PodStats
     it 'it reset the request count when recieving "/api/v1/reset_requests_count' do
       StatsApp.request_count = 23
 
-      get "/api/v1/reset_requests_count", 'HTTPS' => 'on'
+      post "/api/v1/reset_requests_count", 'HTTPS' => 'on'
       last_response.body.should == "0"
       StatsApp.request_count.should == 0
     end

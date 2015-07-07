@@ -23,7 +23,7 @@ begin
 
   REST.post("#{api_base}/pages/#{page_id}/metrics/#{metric_id}/data.json",  :headers => { 'Authorization' => "OAuth #{api_key}" }, :body => { :data => dhash } )
 
-  REST.get(reset_url)
+  REST.post(reset_url)
   sleep 1
 
 rescue Exception => e
