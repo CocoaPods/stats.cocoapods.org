@@ -6,8 +6,8 @@ require 'timeout'
 
 begin
   port = ENV["PORT"]
-  get_url = "http://localhost:#{port}/api/v1/recent_pods_count"
-  reset_url = "http://localhost:#{port}/api/v1/reset_pods_count"
+  get_url = "http://localhost:#{port}/api/v1/recent_requests_count"
+  reset_url = "http://localhost:#{port}/api/v1/reset_requests_count"
 
   number = REST.get(get_url).response.body
   puts "Sending #{number} pods to Status.io"
