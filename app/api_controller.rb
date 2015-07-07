@@ -6,6 +6,7 @@ require 'app/analytics'
 module PodStats
   class StatsApp < Sinatra::Base
     set :protection, :except => :json_csrf
+    set :request_count, 0
 
     before do
       type = content_type(:json)
@@ -28,23 +29,21 @@ module PodStats
     end
 
     get "/api/v1/recent_pods_count" do
-      old_recent_pods = settings.pod_count
-      return old_recent_pods.to_s
+      return settings.request_count.to_s
     end
 
       get "/api/v1/reset_pods_count" do
-        set :pod_count, 0
-        return settings.pod_count
+        set :request_count, 0
+        return settings.request_count.to_s
       end
 
     post '/api/v1/install' do
       install_data = JSON.parse(request.body.read)
 
       if install_data["targets"] == nil || install_data["cocoapods_version"] == nil
-        json_error(400, 'Did not get the correct JSON format.')
+        json_error(400, 'Did not recieve the correct JSON format.')
       else
-        set :pod_count, settings.pod_count + 1
-
+        StatsApp.request_count = StatsApp.request_count + 1
         targets, version = install_data.values_at('targets', 'name')
         targets = targets.map { |t| Target.from_dict(t) }
 

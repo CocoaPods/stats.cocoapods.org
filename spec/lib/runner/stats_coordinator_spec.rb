@@ -14,7 +14,7 @@ describe PodStats::StatsCoordinator do
     it 'sets the schema' do
       ENV["ANALYTICS_DB_SCHEMA"] = 'Hello'
 
-      @connection.expects(:exec).with("set search_path to 'Hello';")
+      @connection.expects(:exec).with("set search_path to $1;", ['Hello'])
 
       @stats.connect
     end
