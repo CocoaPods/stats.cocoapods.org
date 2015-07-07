@@ -28,12 +28,12 @@ module PodStats
       { :ok => "yep" }.to_json
     end
 
-    get "/api/v1/recent_pods_count" do
+    get "/api/v1/recent_requests_count" do
       return settings.request_count.to_s
     end
 
-      get "/api/v1/reset_pods_count" do
-        set :request_count, 0
+      get "/api/v1/reset_requests_count" do
+        StatsApp.request_count = 0
         return settings.request_count.to_s
       end
 
