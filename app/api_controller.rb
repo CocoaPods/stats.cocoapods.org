@@ -6,7 +6,7 @@ require 'app/analytics'
 module PodStats
   class StatsApp < Sinatra::Base
     set :protection, :except => :json_csrf
-  
+
     before do
       type = content_type(:json)
     end
@@ -26,18 +26,30 @@ module PodStats
     get '/api/v1/status' do
       { :ok => "yep" }.to_json
     end
-    
+
+    get "/api/v1/recent_pods_count" do
+      old_recent_pods = settings.pod_count
+      return old_recent_pods.to_s
+    end
+
+      get "/api/v1/reset_pods_count" do
+        set :pod_count, 0
+        return settings.pod_count
+      end
+
     post '/api/v1/install' do
       install_data = JSON.parse(request.body.read)
-    
+
       if install_data["targets"] == nil || install_data["cocoapods_version"] == nil
         json_error(400, 'Did not get the correct JSON format.')
       else
+        set :pod_count, settings.pod_count + 1
+
         targets, version = install_data.values_at('targets', 'name')
         targets = targets.map { |t| Target.from_dict(t) }
-        
+
         targets.each do |target|
-          
+
           # Each target is a "user"
           PodAnalytics.identify(
             :user_id => target.uuid,
@@ -46,9 +58,9 @@ module PodStats
               :cocoapods_version => install_data["cocoapods_version"],
               :platform => target.platform
             })
-                    
+
           target.pods.each do |pod|
-            
+
             PodAnalytics.track(
               :user_id => target.uuid,
               :event => "install",
@@ -63,9 +75,9 @@ module PodStats
               }
             )
           end
-          
+
         end
-      
+
         json_message( 200,
           :ok => "OK"
         )
