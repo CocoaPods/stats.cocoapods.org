@@ -1,2 +1,10 @@
 language: ruby
 install: bundle install --deployment --without development production
+env:
+  - RACK_ENV=test
+before_install:
+  - git clone https://github.com/CocoaPods/Humus
+before_script:
+  - (cd Humus && bundle exec rake db:bootstrap)
+script:
+  - bundle exec rake spec
