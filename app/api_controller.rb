@@ -32,10 +32,10 @@ module PodStats
       return settings.request_count.to_s
     end
 
-      get "/api/v1/reset_requests_count" do
-        StatsApp.request_count = 0
-        return settings.request_count.to_s
-      end
+    post "/api/v1/reset_requests_count" do
+      StatsApp.request_count = 0
+      return settings.request_count.to_s
+    end
 
     post '/api/v1/install' do
       install_data = JSON.parse(request.body.read)
