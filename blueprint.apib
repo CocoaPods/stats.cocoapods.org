@@ -1,0 +1,25 @@
+FORMAT: 1A
+HOST: https://stats.cocoapods.org/api
+
+# CocoaPods Stats
+
+## Register an installation [POST /api/v1/install]
+
++ Request (application/json)
+    + Attributes
+        + targets (array, required)
+            + (object)
+                + uuid: dc11f13f1174c981a6582e6e62325b17e13711c6 (required)
+                + type: `com.apple.product-type.application` (required)
+                + pods (array, required) - A collection of Pods being installed
+                    + (object)
+                        + name: QueryKit (required)
+                        + version: `1.0.0` (required)
+                + platform: ios (required)
+        + cocoapods_version: `0.38.0` (required)
+        + pod_try: false (boolean)
+
++ Response 200 (application/json)
+
+        { "ok": "OK" }
+
