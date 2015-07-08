@@ -77,9 +77,7 @@ module PodStats
 
         end
 
-        json_message( 200,
-          :ok => "OK"
-        )
+        204
       end
     end
   end

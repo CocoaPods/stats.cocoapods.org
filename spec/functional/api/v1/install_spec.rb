@@ -40,10 +40,7 @@ module PodStats
 
       post "/api/v1/install", @data.to_json,  'HTTPS' => 'on'
 
-      last_response.status.should == 200
-      last_response.content_type.should == 'application/json'
-
-      JSON.parse(last_response.body).should == { 'ok' => "OK" }
+      last_response.status.should == 204
     end
 
     it 'creates the right analytics events' do
