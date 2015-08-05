@@ -12,6 +12,7 @@ module PodStats
     stats.connect
 
     Pod.where(:deleted => false).each do |pod|
+      puts "Grabbing stats for: #{pod.name}"
       data = stats.stat_for_pod pod.id, pod.name
       stats.update_pod pod.id,data
     end
