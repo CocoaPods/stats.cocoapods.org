@@ -26,7 +26,7 @@ module PodStats
         @connection = PGconn.new(db.host, db.port, '', '', db.path[1..-1], db.user, db.password)
       end
 
-      @connection.exec "set search_path to $1;", [ENV["ANALYTICS_DB_SCHEMA"]]
+      @connection.exec "set search_path to #{ ENV["ANALYTICS_DB_SCHEMA"] };"
     end
 
     def metrics_for_pod name
@@ -73,9 +73,9 @@ module PodStats
         WHERE dependency_name = $1
         AND pod_try = true
       eos
-      query << "AND sent_at >= current_date - interval $2" if time
+      query << "AND sent_at >= current_date - interval '#{time}'" if time
 
-      @connection.exec(query, [pod_name, time])[0]["count"].to_i || 0
+      @connection.exec(query, [pod_name])[0]["count"].to_i || 0
     end
 
     def download pod_name, time=nil
@@ -85,9 +85,8 @@ module PodStats
         WHERE dependency_name = $1
         AND pod_try = false
       eos
-      query << "AND sent_at >= current_date - interval $2" if time
-
-      @connection.exec(query, [pod_name, time])[0]["count"].to_i || 0
+      query << "AND sent_at >= current_date - interval '#{time}'" if time
+      @connection.exec(query, [pod_name])[0]["count"].to_i || 0
     end
 
     def target pod_name, type, time=nil
@@ -100,9 +99,9 @@ module PodStats
         AND product_type = $2
         AND pod_try = false
       eos
-      query << "AND sent_at >= current_date - interval $3" if time
+      query << "AND sent_at >= current_date - interval '#{time}'" if time
 
-      @connection.exec(query, [pod_name, type_id, time])[0]["count"].to_i || 0
+      @connection.exec(query, [pod_name, type_id])[0]["count"].to_i || 0
     end
 
   end
