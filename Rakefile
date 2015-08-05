@@ -1,3 +1,6 @@
+require 'bundler/setup'
+load 'tasks/get_access_token.rake'
+
 desc 'Install the dependencies'
 task :bootstrap do
   sh 'git submodule update --init'

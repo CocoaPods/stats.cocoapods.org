@@ -10,6 +10,11 @@ gem 'sequel'
 gem 'sinatra'
 gem 'analytics-ruby', '~> 2.0.0', :require => 'segment/analytics'
 
+# For grabbing cocoapods page analytics
+gem 'legato'
+gem 'oauth2'
+gem 'google-oauth2-installed'
+
 group :rake do
   gem 'rake'
   gem 'terminal-table'
