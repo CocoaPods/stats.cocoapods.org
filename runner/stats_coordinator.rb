@@ -7,19 +7,6 @@ module PodStats
   class StatsCoordinator
     attr_accessor :connection
 
-    PRODUCT_TYPE_UTI = {
-      :application       => 'com.apple.product-type.application',
-      :framework         => 'com.apple.product-type.framework',
-      :dynamic_library   => 'com.apple.product-type.library.dynamic',
-      :static_library    => 'com.apple.product-type.library.static',
-      :bundle            => 'com.apple.product-type.bundle',
-      :unit_test_bundle  => 'com.apple.product-type.bundle.unit-test',
-      :app_extension     => 'com.apple.product-type.app-extension',
-      :command_line_tool => 'com.apple.product-type.tool',
-      :watch_app         => 'com.apple.product-type.application.watchapp',
-      :watch_extension   => 'com.apple.product-type.watchkit-extension',
-    }.freeze
-
     def connect
       unless @connection
         db = URI(ENV["ANALYTICS_SQL_URL"])
