@@ -7,19 +7,6 @@ module PodStats
   class StatsCoordinator
     attr_accessor :connection
 
-    PRODUCT_TYPE_UTI = {
-      :application       => 'com.apple.product-type.application',
-      :framework         => 'com.apple.product-type.framework',
-      :dynamic_library   => 'com.apple.product-type.library.dynamic',
-      :static_library    => 'com.apple.product-type.library.static',
-      :bundle            => 'com.apple.product-type.bundle',
-      :unit_test_bundle  => 'com.apple.product-type.bundle.unit-test',
-      :app_extension     => 'com.apple.product-type.app-extension',
-      :command_line_tool => 'com.apple.product-type.tool',
-      :watch_app         => 'com.apple.product-type.application.watchapp',
-      :watch_extension   => 'com.apple.product-type.watchkit-extension',
-    }.freeze
-
     def connect
       unless @connection
         db = URI(ENV["ANALYTICS_SQL_URL"])
@@ -52,7 +39,7 @@ module PodStats
       metrics.merge({
         :pod_id => pod_id,
         :is_active => metrics.any? { |_, installs| installs.nonzero? },
-        :updated_at => Time.new
+        :updated_at => Time.now
       })
     end
 
@@ -61,30 +48,30 @@ module PodStats
       if result
         StatsMetrics.where(id: result.id).update(data)
       else
-        data[:created_at] = Time.new
+        data[:created_at] = Time.now
         StatsMetrics.insert(data)
       end
     end
 
     def pod_try pod_name, time=nil
-      query = <<-eos
+      query = <<-SQL
         SELECT COUNT(dependency_name)
         FROM install
         WHERE dependency_name = $1
         AND pod_try = true
-      eos
+      SQL
       query << "AND sent_at >= current_date - interval '#{time}'" if time
 
       @connection.exec(query, [pod_name])[0]["count"].to_i || 0
     end
 
     def download pod_name, time=nil
-      query = <<-eos
+      query = <<-SQL
         SELECT COUNT(dependency_name)
         FROM install
         WHERE dependency_name = $1
         AND pod_try = false
-      eos
+      SQL
       query << "AND sent_at >= current_date - interval '#{time}'" if time
       @connection.exec(query, [pod_name])[0]["count"].to_i || 0
     end
@@ -92,13 +79,13 @@ module PodStats
     def target pod_name, type, time=nil
       type_id = PRODUCT_TYPE_UTI[type]
 
-      query = <<-eos
+      query = <<-SQL
         SELECT COUNT(DISTINCT(user_id))
         FROM install
         WHERE dependency_name = $1
         AND product_type = $2
         AND pod_try = false
-      eos
+      SQL
       query << "AND sent_at >= current_date - interval '#{time}'" if time
 
       @connection.exec(query, [pod_name, type_id])[0]["count"].to_i || 0
