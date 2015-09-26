@@ -10,37 +10,37 @@ module PodStats
     def get_all_targets type
       type_id = PRODUCT_TYPE_UTI[type]
 
-      query = <<-eos
+      query = <<-SQL
         SELECT COUNT(DISTINCT(user_id))
         FROM install
         WHERE product_type = $1
         AND pod_try = false
-      eos
+      SQL
       @connection.exec(query, [type_id])[0]["count"].to_i || 0
     end
 
     def get_all_podfiles
-      query = <<-eos
+      query = <<-SQL
         SELECT COUNT(DISTINCT(user_id))
         FROM install
-      eos
+      SQL
       @connection.exec(query)[0]["count"].to_i || 0
     end
 
     def get_all_downloads
-      query = <<-eos
+      query = <<-SQL
         SELECT COUNT(user_id)
         FROM install
-      eos
+      SQL
       @connection.exec(query)[0]["count"].to_i || 0
     end
 
     def get_all_extensions
-      query = <<-eos
+      query = <<-SQL
         SELECT COUNT(DISTINCT(user_id))
         FROM install
         WHERE product_type LIKE '%extension%'
-      eos
+      SQL
       @connection.exec(query)[0]["count"].to_i || 0
     end
 
@@ -51,8 +51,8 @@ module PodStats
         :app_total => get_all_targets(:application),
         :tests_total => get_all_targets(:unit_test_bundle),
         :extensions_total => get_all_extensions,
-        :created_at => Time.new,
-        :updated_at => Time.new
+        :created_at => Time.now,
+        :updated_at => Time.now
       }
     end
 

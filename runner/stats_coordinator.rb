@@ -39,7 +39,7 @@ module PodStats
       metrics.merge({
         :pod_id => pod_id,
         :is_active => metrics.any? { |_, installs| installs.nonzero? },
-        :updated_at => Time.new
+        :updated_at => Time.now
       })
     end
 
@@ -48,30 +48,30 @@ module PodStats
       if result
         StatsMetrics.where(id: result.id).update(data)
       else
-        data[:created_at] = Time.new
+        data[:created_at] = Time.now
         StatsMetrics.insert(data)
       end
     end
 
     def pod_try pod_name, time=nil
-      query = <<-eos
+      query = <<-SQL
         SELECT COUNT(dependency_name)
         FROM install
         WHERE dependency_name = $1
         AND pod_try = true
-      eos
+      SQL
       query << "AND sent_at >= current_date - interval '#{time}'" if time
 
       @connection.exec(query, [pod_name])[0]["count"].to_i || 0
     end
 
     def download pod_name, time=nil
-      query = <<-eos
+      query = <<-SQL
         SELECT COUNT(dependency_name)
         FROM install
         WHERE dependency_name = $1
         AND pod_try = false
-      eos
+      SQL
       query << "AND sent_at >= current_date - interval '#{time}'" if time
       @connection.exec(query, [pod_name])[0]["count"].to_i || 0
     end
@@ -79,13 +79,13 @@ module PodStats
     def target pod_name, type, time=nil
       type_id = PRODUCT_TYPE_UTI[type]
 
-      query = <<-eos
+      query = <<-SQL
         SELECT COUNT(DISTINCT(user_id))
         FROM install
         WHERE dependency_name = $1
         AND product_type = $2
         AND pod_try = false
-      eos
+      SQL
       query << "AND sent_at >= current_date - interval '#{time}'" if time
 
       @connection.exec(query, [pod_name, type_id])[0]["count"].to_i || 0
