@@ -46,7 +46,7 @@ begin
     exec 'bundle exec kicker -c'
   end
 
-  task 'Get stats for all pods'
+  desc 'Get stats for all pods'
   task :daily do
     exec 'bundle', 'exec', 'foreman', 'run', 'ruby', 'runner/daily_runner.rb', '-r', 'config/init'
   end
