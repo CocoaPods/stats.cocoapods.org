@@ -35,6 +35,7 @@ module PodStats
     end
 
     def stat_for_pod pod_id, name
+      print(".")
       metrics = metrics_for_pod name
       metrics.merge({
         :pod_id => pod_id,
@@ -52,7 +53,7 @@ module PodStats
         StatsMetrics.insert(data)
       end
     end
-    
+
     def total_installs name
       installs = installs_total.try(:[], name).try(:[], 'downloads').try(:to_i)
       installs || 0
@@ -68,7 +69,7 @@ module PodStats
       installs || 0
     end
 
-    def total_pod_tries name 
+    def total_pod_tries name
       installs = installs_total.try(:[], name).try(:[], 'pod_tries').try(:to_i)
       installs || 0
     end
@@ -102,6 +103,7 @@ module PodStats
 
     def targets_total
       return @targets_total if @targets_total
+      puts "Grabbing all stats."
       result = Hash.new { |h, k| h[k] = {} }
 
       targets.each do |row|
@@ -109,6 +111,8 @@ module PodStats
         product_type = row['product_type']
         result[name][product_type] = row['installs']
       end
+
+      puts "Grabbed."
       @targets_total = result
     end
 

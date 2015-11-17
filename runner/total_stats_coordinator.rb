@@ -57,8 +57,10 @@ module PodStats
     end
 
     def update_total_stats_for_today
+      puts "Grabbing Daily Total Stats."
       stats = grab_stats
       TotalStats.insert(stats)
+      puts "Grabbed."
     end
 
   end
