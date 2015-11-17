@@ -18,19 +18,19 @@ module PodStats
 
     def metrics_for_pod name
       {
-        :download_total => download(name),
-        :download_week => download(name, "7 days"),
-        :download_month => download(name, "30 days"),
-        :app_total => target(name, :application),
-        :app_week => target(name, :application, "7 days"),
-        :tests_total => target(name, :unit_test_bundle),
-        :tests_week => target(name, :unit_test_bundle, "7 days"),
-        :extension_total => target(name, :app_extension),
-        :extension_week => target(name, :app_extension, "7 days"),
-        :watch_total => target(name, :watch_extension),
-        :watch_week => target(name, :watch_extension, "7 days"),
-        :pod_try_total => pod_try(name),
-        :pod_try_week => pod_try(name, "7 days"),
+        :download_total => total_installs(name),
+        :download_week => weekly_installs(name),
+        :download_month => monthly_installs(name),
+        :app_total => target_total_installs(name, :application),
+        :app_week => target_weekly_installs(name, :application),
+        :tests_total => target_total_installs(name, :unit_test_bundle),
+        :tests_week => target_weekly_installs(name, :unit_test_bundle),
+        :extension_total => target_total_installs(name, :app_extension),
+        :extension_week => target_weekly_installs(name, :app_extension),
+        :watch_total => target_total_installs(name, :watch_extension),
+        :watch_week => target_weekly_installs(name, :watch_extension),
+        :pod_try_total => total_pod_tries(name),
+        :pod_try_week => weekly_pod_tries(name),
       }
     end
 
@@ -52,44 +52,105 @@ module PodStats
         StatsMetrics.insert(data)
       end
     end
-
-    def pod_try pod_name, time=nil
-      query = <<-SQL
-        SELECT COUNT(dependency_name)
-        FROM install
-        WHERE dependency_name = $1
-        AND pod_try = true
-      SQL
-      query << "AND sent_at >= current_date - interval '#{time}'" if time
-
-      @connection.exec(query, [pod_name])[0]["count"].to_i || 0
+    
+    def total_installs name
+      installs = installs_total.try(:[], name).try(:[], 'downloads').try(:to_i)
+      installs || 0
     end
 
-    def download pod_name, time=nil
-      query = <<-SQL
-        SELECT COUNT(dependency_name)
-        FROM install
-        WHERE dependency_name = $1
-        AND pod_try = false
-      SQL
-      query << "AND sent_at >= current_date - interval '#{time}'" if time
-      @connection.exec(query, [pod_name])[0]["count"].to_i || 0
+    def weekly_installs name
+      installs = installs_week.try(:[], name).try(:[], 'downloads').try(:to_i)
+      installs || 0
     end
 
-    def target pod_name, type, time=nil
-      type_id = PRODUCT_TYPE_UTI[type]
-
-      query = <<-SQL
-        SELECT COUNT(DISTINCT(user_id))
-        FROM install
-        WHERE dependency_name = $1
-        AND product_type = $2
-        AND pod_try = false
-      SQL
-      query << "AND sent_at >= current_date - interval '#{time}'" if time
-
-      @connection.exec(query, [pod_name, type_id])[0]["count"].to_i || 0
+    def monthly_installs name
+      installs = installs_month.try(:[], name).try(:[], 'downloads').try(:to_i)
+      installs || 0
     end
 
+    def total_pod_tries name 
+      installs = installs_total.try(:[], name).try(:[], 'pod_tries').try(:to_i)
+      installs || 0
+    end
+
+    def weekly_pod_tries name
+      installs = installs_week.try(:[], name).try(:[], 'pod_tries').try(:to_i)
+      installs || 0
+    end
+
+    def target_total_installs name, product_type
+      installs = targets_total.try(:[], name).try(:[], PRODUCT_TYPE_UTI[product_type]).try(:to_i)
+      installs || 0
+    end
+
+    def target_weekly_installs name, product_type
+      installs = targets_week.try(:[], name).try(:[], PRODUCT_TYPE_UTI[product_type]).try(:to_i)
+      installs || 0
+    end
+
+    def installs_total
+      @installs_total ||= Hash[installs.map { |row| [row['dependency_name'], row] }]
+    end
+
+    def installs_week
+      @installs_week ||= Hash[installs('7 days').map { |row| [row['dependency_name'], row] }]
+    end
+
+    def installs_month
+      @installs_month ||= Hash[installs('30 days').map { |row| [row['dependency_name'], row] }]
+    end
+
+    def targets_total
+      return @targets_total if @targets_total
+      result = Hash.new { |h, k| h[k] = {} }
+
+      targets.each do |row|
+        name = row['dependency_name']
+        product_type = row['product_type']
+        result[name][product_type] = row['installs']
+      end
+      @targets_total = result
+    end
+
+    def targets_week
+      return @targets_week if @targets_week
+      result = Hash.new { |h, k| h[k] = {} }
+
+      targets('7 days').each do |row|
+        name = row['dependency_name']
+        product_type = row['product_type']
+        result[name][product_type] = row['installs']
+      end
+      @targets_week = result
+    end
+
+    def installs time = nil
+      where = ''
+      where = "WHERE sent_at >= current_date - interval '#{time}'" if time
+      query = <<-SQL
+        SELECT dependency_name,
+               count(CASE WHEN pod_try THEN 1 ELSE null END) AS pod_tries,
+               count(CASE WHEN pod_try THEN null ELSE 1 END) AS downloads
+        FROM install
+        #{where}
+        GROUP BY dependency_name
+      SQL
+
+      @connection.exec(query)
+    end
+
+    def targets time = nil
+      where = ''
+      where = "AND sent_at >= current_date - interval '#{time}'" if time
+
+      query = <<-SQL
+        SELECT dependency_name, product_type, COUNT(DISTINCT(user_id)) AS installs
+        FROM install
+        WHERE pod_try = false #{where}
+        GROUP BY dependency_name, product_type
+      SQL
+
+      @connection.exec(query)
+    end
   end
 end
