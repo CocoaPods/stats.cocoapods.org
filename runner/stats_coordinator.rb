@@ -9,11 +9,10 @@ module PodStats
 
     def connect
       unless @connection
-        db = URI(ENV["ANALYTICS_SQL_URL"])
-        @connection = PGconn.new(db.host, db.port, '', '', db.path[1..-1], db.user, db.password)
+        @connection = PG::connect(ENV["AGGREGATES_SQL_URL"])
       end
 
-      @connection.exec "set search_path to #{ ENV["ANALYTICS_DB_SCHEMA"] };"
+      @connection.exec "set search_path to #{ ENV["AGGREGATES_DB_SCHEMA"] };"
     end
 
     def metrics_for_pod name
@@ -21,14 +20,6 @@ module PodStats
         :download_total => total_installs(name),
         :download_week => weekly_installs(name),
         :download_month => monthly_installs(name),
-        :app_total => target_total_installs(name, :application),
-        :app_week => target_weekly_installs(name, :application),
-        :tests_total => target_total_installs(name, :unit_test_bundle),
-        :tests_week => target_weekly_installs(name, :unit_test_bundle),
-        :extension_total => target_total_installs(name, :app_extension),
-        :extension_week => target_weekly_installs(name, :app_extension),
-        :watch_total => target_total_installs(name, :watch_extension),
-        :watch_week => target_weekly_installs(name, :watch_extension),
         :pod_try_total => total_pod_tries(name),
         :pod_try_week => weekly_pod_tries(name),
       }
@@ -79,16 +70,6 @@ module PodStats
       installs || 0
     end
 
-    def target_total_installs name, product_type
-      installs = targets_total.try(:[], name).try(:[], PRODUCT_TYPE_UTI[product_type]).try(:to_i)
-      installs || 0
-    end
-
-    def target_weekly_installs name, product_type
-      installs = targets_week.try(:[], name).try(:[], PRODUCT_TYPE_UTI[product_type]).try(:to_i)
-      installs || 0
-    end
-
     def installs_total
       @installs_total ||= Hash[installs.map { |row| [row['dependency_name'], row] }]
     end
@@ -101,57 +82,16 @@ module PodStats
       @installs_month ||= Hash[installs('30 days').map { |row| [row['dependency_name'], row] }]
     end
 
-    def targets_total
-      return @targets_total if @targets_total
-      puts "Grabbing all stats."
-      result = Hash.new { |h, k| h[k] = {} }
-
-      targets.each do |row|
-        name = row['dependency_name']
-        product_type = row['product_type']
-        result[name][product_type] = row['installs']
-      end
-
-      puts "Grabbed."
-      @targets_total = result
-    end
-
-    def targets_week
-      return @targets_week if @targets_week
-      result = Hash.new { |h, k| h[k] = {} }
-
-      targets('7 days').each do |row|
-        name = row['dependency_name']
-        product_type = row['product_type']
-        result[name][product_type] = row['installs']
-      end
-      @targets_week = result
-    end
-
     def installs time = nil
       where = ''
-      where = "WHERE sent_at >= current_date - interval '#{time}'" if time
+      where = "WHERE rollup_date >= current_date - interval '#{time}'" if time
       query = <<-SQL
         SELECT dependency_name,
-               count(CASE WHEN pod_try THEN 1 ELSE null END) AS pod_tries,
-               count(CASE WHEN pod_try THEN null ELSE 1 END) AS downloads
-        FROM install
+               SUM(pod_tries) as pod_tries,
+               SUM(downloads) as downloads
+        FROM downloads
         #{where}
-        GROUP BY dependency_name
-      SQL
-
-      @connection.exec(query)
-    end
-
-    def targets time = nil
-      where = ''
-      where = "AND sent_at >= current_date - interval '#{time}'" if time
-
-      query = <<-SQL
-        SELECT dependency_name, product_type, COUNT(DISTINCT(user_id)) AS installs
-        FROM install
-        WHERE pod_try = false #{where}
-        GROUP BY dependency_name, product_type
+        GROUP BY dependency_name;
       SQL
 
       @connection.exec(query)

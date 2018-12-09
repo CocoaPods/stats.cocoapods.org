@@ -9,6 +9,7 @@ gem 'pg'
 gem 'sequel'
 gem 'sinatra'
 gem 'analytics-ruby', '~> 2.0.0', :require => 'segment/analytics'
+gem 'parallel'
 
 group :rake do
   gem 'rake'
@@ -17,6 +18,7 @@ end
 
 group :development do
   gem 'kicker'
+  gem 'pry'
 end
 
 group :development, :production do

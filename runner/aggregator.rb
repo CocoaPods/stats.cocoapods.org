@@ -1,10 +1,8 @@
-require_relative 'stats_coordinator'
-require_relative 'total_stats_coordinator'
 require_relative '../config/init'
 require_relative '../lib/pod_metrics'
 require_relative '../app/models/pod'
-
-require 'benchmark'
+require_relative 'aggregation_coordinator'
+require 'parallel'
 
 module PodStats
 
@@ -21,18 +19,22 @@ module PodStats
     :watch_extension   => 'com.apple.product-type.watchkit-extension',
   }.freeze
 
-  puts Benchmark.measure {
+  stats = AggregationCoordinator.new
+  stats.connect
 
-    stats = StatsCoordinator.new
-    stats.connect
+  cocapods_version_data = stats.pod_usage_version_by_day
+  stats.upsert_version_data cocoapods_version_data
 
-    Pod.where(:deleted => false).limit(2).each do |pod|
-      data = stats.stat_for_pod pod.id, pod.name
-      stats.update_pod pod.id,data
+  Pod.where(:deleted => false).each do |pod|
+    puts "[#{pod.name}] Beginning"
+    data = stats.installations_by_day pod.name
+    meta = {"pod_id"=>pod.id}
+    h = data.map do |row|
+      meta.merge(row.to_h)
     end
-
-    total = TotalStatsCoordinator.new
-    total.connection = stats.connection
-    total.update_total_stats_for_today
-  }.to_s
+    puts "[#{pod.name}] Upserting #{h.size} rows"
+    stats.upsert_data(h)
+    puts "[#{pod.name}] Done"
+    stats.drop_historic_data_for_pod pod.name
+  end
 end
