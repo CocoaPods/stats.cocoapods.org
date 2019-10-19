@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'sinatra'
+ruby '2.4.9'
 
 group :rake do
   gem 'rake'
