@@ -1,7 +1,4 @@
 require 'sinatra/base'
-require 'app/models/pod'
-require 'app/models/target'
-require 'app/analytics'
 
 module PodStats
   class StatsApp < Sinatra::Base
@@ -37,15 +34,7 @@ module PodStats
     end
 
     post '/api/v1/install' do
-      install_data = JSON.parse(request.body.read)
-
-      if install_data["targets"] == nil || install_data["cocoapods_version"] == nil
-        json_error(400, 'Did not recieve the correct JSON format.')
-      else
-        # NOOP checkout to 018dec2b0c5e1a98ddd028a93e0629ecd72c3f0e
-        # if you'd like to see the old behavior
-        204
-      end
+      204
     end
   end
 end
