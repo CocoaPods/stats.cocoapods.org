@@ -29,12 +29,11 @@ module PodStats
     end
 
     get "/api/v1/recent_requests_count" do
-      return settings.request_count.to_s
+      return 0
     end
 
     post "/api/v1/reset_requests_count" do
-      StatsApp.request_count = 0
-      return settings.request_count.to_s
+      return 0
     end
 
     post '/api/v1/install' do
@@ -43,40 +42,8 @@ module PodStats
       if install_data["targets"] == nil || install_data["cocoapods_version"] == nil
         json_error(400, 'Did not recieve the correct JSON format.')
       else
-        StatsApp.request_count = StatsApp.request_count + 1
-        targets, version = install_data.values_at('targets', 'name')
-        targets = targets.map { |t| Target.from_dict(t) }
-
-        targets.each do |target|
-
-          # Each target is a "user"
-          PodAnalytics.identify(
-            :user_id => target.uuid,
-            :traits => {
-              :product_type => target.type,
-              :cocoapods_version => install_data["cocoapods_version"],
-              :platform => target.platform
-            })
-
-          target.pods.each do |pod|
-
-            PodAnalytics.track(
-              :user_id => target.uuid,
-              :event => "install",
-              :properties => {
-                :product_type => target.type,
-                :pod_try => install_data["pod_try"],
-                :platform => target.platform,
-                :dependency => {
-                  :name => pod.name,
-                  :version => pod.version
-                }
-              }
-            )
-          end
-
-        end
-
+        # NOOP checkout to 018dec2b0c5e1a98ddd028a93e0629ecd72c3f0e
+        # if you'd like to see the old behavior
         204
       end
     end
