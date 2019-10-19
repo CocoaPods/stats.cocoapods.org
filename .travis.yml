@@ -1,14 +1,9 @@
 language: ruby
+rvm:
+  - 2.4.1
+
 install:
   - bundle install
-  - npm install -g dredd
-env:
-  - RACK_ENV=test
-before_install:
-  - git clone https://github.com/CocoaPods/Humus
-before_script:
-  - (cd Humus && bundle exec rake db:bootstrap)
-  - bundle exec thin start -d -p 8765
+
 script:
   - bundle exec rake spec
-  - dredd blueprint.apib http://localhost:8765

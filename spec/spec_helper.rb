@@ -33,9 +33,6 @@ class Bacon::Context
     STATS_APP_LOGGER.info('-' * description.size)
     STATS_APP_LOGGER.info(description)
     STATS_APP_LOGGER.info('-' * description.size)
-    Sequel::Model.db.transaction(:rollback => :always) do
-      run_requirement_before_sequel(description, spec)
-    end
   end
 
   alias_method :after_webmock, :after
