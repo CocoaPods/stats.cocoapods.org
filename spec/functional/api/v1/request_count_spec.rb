@@ -35,27 +35,18 @@ module PodStats
     end
 
     it 'an install raises the request count' do
-      PodAnalytics.stubs(:identify)
-      PodAnalytics.stubs(:track)
-      StatsApp.request_count = 0
-
       post "/api/v1/install", @data.to_json,  'HTTPS' => 'on'
-      StatsApp.request_count.should == 1
+      last_response.status.should == 204
     end
 
     it 'it gives the right value to "/api/v1/recent_requests_count' do
-      StatsApp.request_count = 23
-
       get "/api/v1/recent_requests_count", 'HTTPS' => 'on'
-      last_response.body.should == "23"
+      last_response.body.should == "0"
     end
 
     it 'it reset the request count when recieving "/api/v1/reset_requests_count' do
-      StatsApp.request_count = 23
-
       post "/api/v1/reset_requests_count", 'HTTPS' => 'on'
       last_response.body.should == "0"
-      StatsApp.request_count.should == 0
     end
   end
 end
